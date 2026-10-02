@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { readDb } from "./store";
+import { seed } from "./seed";
 import type { Role } from "./types";
 
 const COOKIE = "ash_session";
@@ -12,8 +12,9 @@ export type Session = {
 };
 
 export async function login(username: string, password: string): Promise<Session | null> {
-  const db = await readDb();
-  const user = db.users.find(
+  // Check directly against seed users — no filesystem I/O needed.
+  // This is safe for Vercel serverless where the filesystem is read-only.
+  const user = seed.users.find(
     (u) => u.username.toLowerCase() === username.trim().toLowerCase() && u.password === password,
   );
   if (!user) return null;
